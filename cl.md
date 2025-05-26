@@ -166,10 +166,6 @@ nmap -Pn 10.10.10.2 -p 445 --script smb-protocols
 
 使用Metasploit自动化利用：
 ![](img/攻击.png)
-启动交互式 shell：
-```
-script /dev/null -c bash
-```
 
 查看flag
 
