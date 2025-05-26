@@ -43,22 +43,6 @@ form_id=user_register_form&_drupal_ajax=1&mail[#post_render][]=passthru&mail[#ty
 
 这个请求会利用Drupal的AJAX表单处理机制，通过`#post_render`回调执行系统命令。
 
-## 防护措施
-
-1. **升级Drupal**：
-   - Drupal 7.x 升级到7.58或更高版本
-   - Drupal 8.5.x 升级到8.5.1或更高版本
-   - Drupal 8.4.x 升级到8.4.6或更高版本
-
-2. **临时缓解措施**：
-   - 禁用用户注册功能
-   - 限制对/user/register路径的访问
-   - 应用官方提供的补丁
-
-3. **安全监控**：
-   - 监控服务器日志中的可疑POST请求
-   - 检查是否有异常文件被创建或修改
-
 ## 漏洞重要性
 
 CVE-2018-7600被评为"高危"漏洞(CVSS评分9.8)，因为：
