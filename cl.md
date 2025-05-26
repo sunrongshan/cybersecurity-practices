@@ -111,7 +111,7 @@ Apache
 ```
 sudo systemctl restart apache2
 ```
-
+再次发送前面的请求，
 得到响应：
 ```
 HTTP/1.1 403 Forbidden
