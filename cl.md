@@ -85,9 +85,8 @@ Content-Type: application/json
 返回结果中包含www-data用户权限信息，证明命令执行成功
 ![](img/利用得到回复.png)
 
-## 漏洞修复
+## 漏洞缓解
 
-临时缓解措施：
 禁用用户注册和危险路由
 
 ### 编辑Drupal的settings.php文件
