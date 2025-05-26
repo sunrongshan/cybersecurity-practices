@@ -27,7 +27,7 @@ CVE-2018-7600，也被称为"Drupalgeddon 2"，是Drupal内容管理系统中的
 
 3. **注入点**：攻击者可以通过控制表单元素的`#`前缀属性(如`#markup`、`#access_callback`等)来注入恶意代码。
 
-4. **代码执行**：通过设置`#access_callback`为PHP函数(如`passthru`、`system`等)，攻击者可以执行任意命令。
+4. **代码执行**：通过注入PHP函数(如`passthru`、`system`等)，攻击者可以执行任意命令。
 
 ### 漏洞利用示例
 
