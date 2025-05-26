@@ -179,6 +179,8 @@ nmap -Pn 10.10.10.2 -p 445 --script smb-protocols
 ```
 根据Nmap脚本扫描结果，目标主机10.10.10.2的Samba服务支持SMBv1（包括危险的NT LM 0.12）以及更高版本的SMBv2/3协议。这为利用CVE-2017-7494（Samba远程代码执行漏洞）提供了直接条件。
 
+这个模块利用的是 Samba 服务中的 "is_known_pipename()" 函数漏洞（CVE-2017-7494），也称为 "SambaCry" 漏洞。该漏洞允许远程攻击者在 Samba 服务器上上传共享库文件，然后通过命名管道加载并执行该库中的恶意代码。
+
 使用Metasploit自动化利用：
 ![](img/攻击.png)
 启动交互式 shell：
