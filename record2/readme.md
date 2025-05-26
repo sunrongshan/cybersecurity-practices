@@ -808,7 +808,7 @@ OWASP CRS 是一组预定义的规则，覆盖了多种 Web 攻击类型。
    ModSecurity 会在每次请求时应用这些规则，检测并拦截恶意流量。
 
 #### 4. 自定义 Wordpress 漏洞规则配置
-为了防御 Wordpress 漏洞攻击，我们需要添加针对 jndi: 的自定义规则。
+为了防御 Wordpress 漏洞攻击，我们需要添加针对其原理的自定义规则。
 
 ##### 添加自定义规则
 1. 创建自定义规则文件：
@@ -837,66 +837,54 @@ OWASP CRS 是一组预定义的规则，覆盖了多种 Web 攻击类型。
       block,\
       msg:'可疑的BuddyPress账户激活尝试'"
    ```
+   🔹**第一条规则：拦截尝试修改角色的请求（权限提升）**
+      | 参数名称 | 值/表达式 | 说明 |
+      |----------|------------|------|
+      | `SecRule` | - | 定义一条 ModSecurity 规则 |
+      | `REQUEST_URI` | `@contains /wp-json/buddypress/v1/members/me` | 匹配请求 URI 中是否包含特定路径（即目标接口） |
+      | `id` | `1001` | 规则唯一标识符，便于日志追踪和管理 |
+      | `phase` | `2` | 在请求处理阶段 2（请求头和请求体已解析）执行此规则 |
+      | `block` | - | 如果匹配成功，则阻止请求并返回 403 Forbidden |
+      | `msg` | `'BuddyPress 权限提升尝试'` | 当规则触发时记录的日志信息 |
+      | `chain` | - | 表示该规则与下一条规则形成“链式”匹配关系，必须同时满足所有条件才会触发动作 |
 
----
+      - 作用：
+         1. 检测请求是否访问了 `/wp-json/buddypress/v1/members/me` 接口；
+         2. 判断请求方法是否为 `POST`；
+         3. 检查请求体中是否包含 `"roles": "administrator"`；
+         4. 如果全部条件都满足，ModSecurity 将阻断请求，并记录日志。
 
-🔹 第一条规则：拦截尝试修改角色的请求
 
-```apache
-SecRule REQUEST_URI "@contains /wp-json/buddypress/v1/members/me" \
-   "id:1001,\
-   phase:2,\
-   block,\
-   msg:'BuddyPress 权限提升尝试',\
-   chain"
-```
+   🔹**第二条规则：拦截异常的激活请求（注册绕过）**
 
-| 参数名称 | 值/表达式 | 说明 |
-|----------|------------|------|
-| `SecRule` | - | 定义一条 ModSecurity 规则 |
-| `REQUEST_URI` | `@contains /wp-json/buddypress/v1/members/me` | 匹配请求 URI 中是否包含 `/wp-json/buddypress/v1/members/me` 路径 |
-| `id` | `1001` | 规则唯一标识符，便于日志追踪和管理 |
-| `phase` | `2` | 指定在请求处理阶段 2（请求头和请求体已解析）执行此规则 |
-| `block` | - | 如果匹配成功，则阻止请求并返回 403 Forbidden |
-| `msg` | `'BuddyPress 权限提升尝试'` | 当规则触发时记录的日志信息 |
-| `chain` | - | 表示该规则与下一条规则形成“链式”匹配关系，必须同时满足所有条件才会触发动作 |
+   ```apache
+   SecRule REQUEST_URI "@rx /wp-json/buddypress/v1/signup/activate/[^/]+$" \
+      "id:1002,\
+      phase:2,\
+      block,\
+      msg:'可疑的BuddyPress账户激活尝试'"
+   ```
 
-```apache
-SecRule REQUEST_METHOD "@streq POST" \
-   "chain"
-```
+   | 参数名称 | 值/表达式 | 说明 |
+   |----------|------------|------|
+   | `SecRule` | - | 定义一条 ModSecurity 规则 |
+   | `REQUEST_URI` | `@rx /wp-json/buddypress/v1/signup/activate/[^/]+$` | 使用正则表达式匹配请求 URI 是否符合 `/wp-json/buddypress/v1/signup/activate/<activation_key>` 的格式 |
+   | `id` | `1002` | 规则唯一标识符 |
+   | `phase` | `2` | 在请求处理阶段 2 执行此规则 |
+   | `block` | - | 如果匹配成功，则阻止请求并返回 403 Forbidden |
+   | `msg` | `'可疑的BuddyPress账户激活尝试'` | 当规则触发时记录的日志信息 |
 
-| 参数名称 | 值/表达式 | 说明 |
-|----------|------------|------|
-| `SecRule` | - | 定义一条 ModSecurity 规则 |
-| `REQUEST_METHOD` | `@streq POST` | 精确匹配请求方法是否为 `POST` |
-| `chain` | - | 继续链式匹配，表示当前规则是前一条规则的延续 |
+   - 作用：
+      1. 检测请求是否访问了 BuddyPress 的激活接口；
+      2. 判断 URL 中是否包含一个随机生成的激活密钥（如 `v6EeK8XWihRsxXvXAWPMVzSTO2gs7WdF`）；
+      3. 如果匹配成功，ModSecurity 将阻断请求并记录日志。
 
----
-🔸 第二条规则：检测请求体中是否包含 `"roles": "administrator"`
+| 攻击行为 | 对应规则 | 功能 |
+|----------|-----------|------|
+| 提权（将普通用户变为管理员） | 第一条规则 | 拦截 `/wp-json/buddypress/v1/members/me` 的 POST 请求中包含 `"roles": "administrator"` 的情况 |
+| 注册绕过（直接激活账户） | 第二条规则 | 拦截 `/wp-json/buddypress/v1/signup/activate/<activation_key>` 的请求 |
 
-```apache
-SecRule REQUEST_BODY "@rx \"roles\"\s*:\s*\"administrator\"" \
-      "t:none,t:urlDecode,t:htmlEntityDecode"
-```
-
-| 参数名称 | 值/表达式 | 说明 |
-|----------|------------|------|
-| `SecRule` | - | 定义一条 ModSecurity 规则 |
-| `REQUEST_BODY` | `@rx \"roles\"\s*:\s*\"administrator\""` | 使用正则表达式匹配请求体中的 JSON 字段 `"roles": "administrator"` |
-| `t:none` | - | 不进行任何转换，保留原始数据 |
-| `t:urlDecode` | - | 对请求体进行 URL 解码，防止攻击者通过编码绕过检测 |
-| `t:htmlEntityDecode` | - | 对请求体进行 HTML 实体解码，进一步清洗数据以增强检测准确性 |
-
-**✅ 总结** 
-
-这些规则共同构成了一个完整的防御逻辑，用于检测试图通过 BuddyPress REST API 提权的操作：
-
-1. **第一步**：检测请求是否访问了 `/wp-json/buddypress/v1/members/me` 接口。
-2. **第二步**：确认请求方法是否为 `POST`。
-3. **第三步**：解析请求体内容，判断是否包含 `"roles": "administrator"`。
-
-如果全部条件都满足，ModSecurity 将阻断请求，并记录日志。这种方式可以有效防御 CVE-2021-21389 漏洞利用行为。
+如果条件满足，**ModSecurity 将阻断请求，并记录日志。** 这种方式可以有效防御 CVE-2021-21389 漏洞利用行为。
 
 3. 重启Apache：
    ```bash
