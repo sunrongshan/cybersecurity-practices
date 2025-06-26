@@ -164,6 +164,22 @@ run -j
 ![](./pics/抓包结果之一.png)
 ![](./pics/抓包结果之二.png)
 
+#### 漏洞修复
+
+weblogic-CVE-2019-2725漏洞修复方案
+
+1. 禁⽤bea_wls9_async_response组件；
+
+2. 删除wls9_async_response的war包并重启 ；
+
+3. 禁⽌访问 /_async/* 路径
+
+4. 升级本地JDK版本
+
+* 查阅官方文档，可以看到官方发布的补丁包
+
+[cve-2019-2725补丁](https://www.oracle.com/technetwork/security-advisory/alert-cve-2019-2725-5466295.html?from=timeline) 
+
 ## 遇到的问题
 
 1. 无法登陆，显示服务器内部错误
@@ -181,3 +197,6 @@ run -j
 ![](./pics/查看dockerce.png)
 
 ## 参考资料
+
+[WebLogic漏洞复现（附带修复方法）_weblogic漏洞修复](https://blog.csdn.net/Python84310366/article/details/148626907)
+[网络安全攻防实践](https://github.com/Xuyan-cmd/Network-security-attack-and-defense-practice/blob/main/README.md)
