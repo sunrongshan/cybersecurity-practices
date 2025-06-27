@@ -168,6 +168,8 @@ run -j
 
 weblogic-CVE-2019-2725漏洞修复方案
 
+* Weblogic-cve-2019-2725的漏洞源于在反序列化处理输入信息的过程中存在缺陷，未经授权的攻击者可以发送精心构造的恶意 HTTP 请求，利用该漏洞获取服务器权限，实现远程代码执行。
+
 1. 禁⽤bea_wls9_async_response组件；
 
 2. 删除wls9_async_response的war包并重启 ；
@@ -179,6 +181,87 @@ weblogic-CVE-2019-2725漏洞修复方案
 * 查阅官方文档，可以看到官方发布的补丁包
 
 [cve-2019-2725补丁](https://www.oracle.com/technetwork/security-advisory/alert-cve-2019-2725-5466295.html?from=timeline) 
+
+* 一、漏洞背景与影响
+
+CVE-2019-2725是Oracle WebLogic Server中的一个高危漏洞，属于反序列化远程命令执行漏洞。该漏洞影响WebLogic的`wls9_async`和`wls-wsat`组件，攻击者可以通过发送精心构造的HTTP请求，在未经授权的情况下远程执行命令。这可能导致攻击者完全控制服务器，植入恶意软件，甚至进行横向渗透。
+
+* 二、检测漏洞是否存在
+在修复漏洞之前，需要确认目标WebLogic服务是否存在漏洞。以下是一些检测方法：
+
+1. **检查受影响的组件是否存在**：
+   - 访问以下路径，如果返回页面，则表明该组件存在：
+     - `/_async/AsyncResponseService`
+     - `/_async/AsyncResponseServiceSoap12`
+     - `/wls-wsat/CoordinatorPortType`
+   - 如果返回403错误，也可能表明组件存在但被限制访问。
+2. **检查返回结果**：
+   - 如果访问上述路径返回页面内容，而不是错误信息，说明漏洞可能存在。
+
+![](./pics/漏洞存在1.png)
+![](./pics/漏洞存在2.png)
+![](./pics/漏洞存在3.png)
+
+* 三、修复漏洞的具体步骤
+
+修复该漏洞的核心方法是禁用或删除受影响的组件，并重启WebLogic服务。以下是具体步骤：
+
+1. **定位受影响的文件**
+
+根据WebLogic版本，受影响的文件和路径如下：
+ **10.3.x版本**：
+路径：`\Middleware\wlserver_10.3\server\lib\`
+文件：`wls9_async_response.war` 和 `wls-wsat.war`
+相关临时文件夹：`%DOMAIN_HOME%\servers\AdminServer\tmp\_WL_internal\` 和 `%DOMAIN_HOME%\servers\AdminServer\tmp\.internal\`
+**12.1.3版本**：
+路径：`\Middleware\Oracle_Home\oracle_common\modules\`
+文件：`wls9_async_response.war` 和 `wls-wsat.war`
+
+![](./pics/定位相关文件1.png)
+![](./pics/定位漏洞文件2.png)
+
+2. **删除受影响的文件**
+
+删除`wls9_async_response.war`和`wls-wsat.war`文件及相关文件夹。
+注意：删除文件后，确保备份重要数据，以防误删。
+
+![](./pics/删除相关文件1.png)
+![](./pics/删除相关文件2.png)
+![](./pics/删除相关文件3.png)
+
+3. **重启WebLogic服务**
+
+删除文件后，重启WebLogic服务以使更改生效。
+在Docker环境中，可以通过以下命令重启服务：
+
+```bash
+ docker restart <容器名称>
+```
+
+![](./pics/删除相关文件4.png)
+
+4. **验证修复效果**
+
+- 再次访问检测路径（如`/_async/AsyncResponseService`），如果返回404或403错误，则说明修复成功。
+
+![](./pics/修复成功1.png)
+![](./pics/修复后1.png)
+![](./pics/修复后2.png)
+
+和修复前对比
+![](./pics/修复前1.png)
+![](./pics/修复前2.png)
+
+* 四、注意事项与建议
+
+1. **备份重要数据**：
+   - 在执行删除操作前，请确保对重要数据进行备份，以防误操作导致数据丢失。
+2. **使用官方补丁**：
+   - 如果无法删除受影响的组件，可以考虑应用Oracle官方发布的补丁
+3. **限制访问权限**：
+   - 在修复漏洞后，建议限制对WebLogic服务的访问权限，仅允许授权IP访问。
+4. **监控异常行为**：
+   - 使用日志监控工具（如ELK Stack）监控WebLogic服务器的日志，及时发现异常行为。
 
 ## 遇到的问题
 
@@ -200,3 +283,5 @@ weblogic-CVE-2019-2725漏洞修复方案
 
 [WebLogic漏洞复现（附带修复方法）_weblogic漏洞修复](https://blog.csdn.net/Python84310366/article/details/148626907)
 [网络安全攻防实践](https://github.com/Xuyan-cmd/Network-security-attack-and-defense-practice/blob/main/README.md)
+[Weblogic反序列化远程命令执行漏洞 CVE-2019-2725 详解 - CSDN博客](https://blog.csdn.net/m0_67544876/article/details/147928201)
+[WebLogic反序列化漏洞(CVE-2019-2725补丁绕过) - 博客园](https://www.cnblogs.com/paperpen/p/11043182.html)
